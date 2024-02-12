@@ -21,7 +21,9 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -69,5 +71,27 @@ class MemoApiControllerTest {
 
         assertThat(memos.size()).isEqualTo(1);
         assertThat(memos.get(0).getContent()).isEqualTo(content);
+    }
+
+    @DisplayName("findAllArticles")
+    @Test
+    public void findAllArticles() throws Exception {
+        // given
+        final String url = "/api/memos";
+        final String title = "title";
+        final String content = "content";
+
+        memoRepository.save(Memo.builder()
+                .content(content)
+                .build());
+
+        // when
+        final ResultActions resultActions = mockMvc.perform(get(url)
+                .accept(MediaType.APPLICATION_JSON));
+
+        // then
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].content").value(content));
     }
 }
