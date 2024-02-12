@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import shop.remindermemo.domain.Memo;
 import shop.remindermemo.dto.AddMemoRequest;
 import shop.remindermemo.dto.MemoResponse;
+import shop.remindermemo.dto.UpdateMemoRequest;
 import shop.remindermemo.service.MemoService;
 
 import java.util.List;
@@ -52,5 +53,13 @@ public class MemoApiController {
 
         return ResponseEntity.ok()
                 .build();
+    }
+
+    @PutMapping("/api/memos/{id}")
+    public ResponseEntity<Memo> updateMemo(@PathVariable long id, @RequestBody UpdateMemoRequest request) {
+        Memo updatedMemo = memoService.update(id, request);
+
+        return ResponseEntity.ok()
+                .body(updatedMemo);
     }
 }

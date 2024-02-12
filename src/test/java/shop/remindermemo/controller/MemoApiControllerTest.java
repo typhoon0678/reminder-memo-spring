@@ -16,6 +16,7 @@ import org.springframework.web.context.WebApplicationContext;
 import shop.remindermemo.ReminderMemoApplication;
 import shop.remindermemo.domain.Memo;
 import shop.remindermemo.dto.AddMemoRequest;
+import shop.remindermemo.dto.UpdateMemoRequest;
 import shop.remindermemo.repository.MemoRepository;
 
 import java.util.List;
@@ -24,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
@@ -135,5 +137,33 @@ class MemoApiControllerTest {
         List<Memo> memos = memoRepository.findAll();
 
         assertThat(memos).isEmpty();
+    }
+
+    @DisplayName("updateMemo")
+    @Test
+    public void updateMemo() throws Exception {
+        // given
+        final String url = "/api/memos/{id}";
+        final String content = "content";
+
+        Memo savedMemo = memoRepository.save(Memo.builder()
+                .content(content)
+                .build());
+
+        final String newContent = "new content";
+
+        UpdateMemoRequest request = new UpdateMemoRequest(newContent);
+
+        // when
+        ResultActions result = mockMvc.perform(put(url, savedMemo.getId())
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(objectMapper.writeValueAsString(request)));
+
+        // then
+        result.andExpect(status().isOk());
+
+        Memo memo = memoRepository.findById(savedMemo.getId()).get();
+
+        assertThat(memo.getContent()).isEqualTo(newContent);
     }
 }
