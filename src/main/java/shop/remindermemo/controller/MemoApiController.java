@@ -45,4 +45,12 @@ public class MemoApiController {
         return ResponseEntity.ok()
                 .body(new MemoResponse(memo));
     }
+
+    @DeleteMapping("/api/memos/{id}")
+    public ResponseEntity<Void> deleteMemo(@PathVariable long id) {
+        memoService.delete(id);
+
+        return ResponseEntity.ok()
+                .build();
+    }
 }

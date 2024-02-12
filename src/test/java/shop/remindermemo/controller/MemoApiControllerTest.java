@@ -23,6 +23,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
@@ -113,5 +114,26 @@ class MemoApiControllerTest {
         resultActions
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").value(content));
+    }
+
+    @DisplayName("deleteArticle")
+    @Test
+    public void deleteArticle() throws Exception {
+        // given
+        final String url = "/api/memos/{id}";
+        final String content = "content";
+
+        Memo savedMemo = memoRepository.save(Memo.builder()
+                .content(content)
+                .build());
+
+        // when
+        mockMvc.perform(delete(url, savedMemo.getId()))
+                .andExpect(status().isOk());
+
+        // then
+        List<Memo> memos = memoRepository.findAll();
+
+        assertThat(memos).isEmpty();
     }
 }

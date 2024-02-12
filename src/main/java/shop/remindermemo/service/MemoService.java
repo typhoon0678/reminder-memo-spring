@@ -29,4 +29,8 @@ public class MemoService {
         return memoRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("not found: " + id));
     }
+
+    public void delete(long id) {
+        memoRepository.deleteById(id);
+    }
 }
