@@ -3,10 +3,7 @@ package shop.remindermemo.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import shop.remindermemo.domain.Memo;
 import shop.remindermemo.dto.AddMemoRequest;
 import shop.remindermemo.dto.MemoResponse;
@@ -39,5 +36,13 @@ public class MemoApiController {
 
         return ResponseEntity.ok()
                 .body(memos);
+    }
+
+    @GetMapping("/api/memos/{id}")
+    public ResponseEntity<MemoResponse> findMemo(@PathVariable long id) {
+        Memo memo = memoService.findById(id);
+
+        return ResponseEntity.ok()
+                .body(new MemoResponse(memo));
     }
 }

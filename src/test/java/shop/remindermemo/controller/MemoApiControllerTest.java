@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import shop.remindermemo.ReminderMemoApplication;
 import shop.remindermemo.domain.Memo;
 import shop.remindermemo.dto.AddMemoRequest;
 import shop.remindermemo.repository.MemoRepository;
@@ -73,12 +74,11 @@ class MemoApiControllerTest {
         assertThat(memos.get(0).getContent()).isEqualTo(content);
     }
 
-    @DisplayName("findAllArticles")
+    @DisplayName("findAllMemos")
     @Test
-    public void findAllArticles() throws Exception {
+    public void findAllMemos() throws Exception {
         // given
         final String url = "/api/memos";
-        final String title = "title";
         final String content = "content";
 
         memoRepository.save(Memo.builder()
@@ -93,5 +93,25 @@ class MemoApiControllerTest {
         resultActions
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].content").value(content));
+    }
+
+    @DisplayName("findMemo")
+    @Test
+    public void findMemo() throws Exception {
+        // given
+        final String url = "/api/memos/{id}";
+        final String content = "content";
+
+        Memo savedMemo = memoRepository.save(Memo.builder()
+                .content(content)
+                .build());
+
+        // when
+        final ResultActions resultActions = mockMvc.perform(get(url, savedMemo.getId()));
+
+        // then
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").value(content));
     }
 }

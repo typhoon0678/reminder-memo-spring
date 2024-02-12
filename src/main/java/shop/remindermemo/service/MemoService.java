@@ -24,4 +24,9 @@ public class MemoService {
     public List<Memo> findAll() {
         return memoRepository.findAll();
     }
+
+    public Memo findById(Long id) {
+        return memoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("not found: " + id));
+    }
 }
