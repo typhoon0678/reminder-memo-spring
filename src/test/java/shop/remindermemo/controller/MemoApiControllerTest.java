@@ -13,7 +13,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import shop.remindermemo.ReminderMemoApplication;
 import shop.remindermemo.domain.Memo;
 import shop.remindermemo.dto.AddMemoRequest;
 import shop.remindermemo.dto.UpdateMemoRequest;
@@ -21,7 +20,6 @@ import shop.remindermemo.repository.MemoRepository;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
