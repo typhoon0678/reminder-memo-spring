@@ -5,6 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import shop.remindermemo.domain.Memo;
 import shop.remindermemo.dto.MemoListViewResponse;
 import shop.remindermemo.dto.MemoViewResponse;
@@ -34,5 +35,17 @@ public class MemoViewController {
         model.addAttribute("memo", new MemoViewResponse(memo));
 
         return "memo";
+    }
+
+    @GetMapping("/new-memo")
+    public String newArticle(@RequestParam(required = false) Long id, Model model) {
+        if (id == null) {
+            model.addAttribute("memo", new MemoViewResponse());
+        } else {
+            Memo memo = memoService.findById(id);
+            model.addAttribute("memo", new MemoViewResponse(memo));
+        }
+
+        return "newMemo";
     }
 }
