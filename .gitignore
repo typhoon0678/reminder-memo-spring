@@ -1,5 +1,5 @@
 ### 추가 설정 ###
-*.yml
+**/*.yml
 
 .gradle
 build/
