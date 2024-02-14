@@ -67,11 +67,9 @@ public class WebOAuthSecurityConfig {
         http.logout()
                 .logoutSuccessUrl("/login");
 
-
         http.exceptionHandling()
                 .defaultAuthenticationEntryPointFor(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
                         new AntPathRequestMatcher("/api/**"));
-
 
         return http.build();
     }

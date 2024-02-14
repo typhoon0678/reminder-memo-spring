@@ -1,6 +1,7 @@
 package shop.remindermemo.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shop.remindermemo.domain.Memo;
@@ -19,8 +20,8 @@ public class MemoService {
 
     private final MemoRepository memoRepository;
 
-    public Memo save(AddMemoRequest request) {
-        return memoRepository.save(request.toEntity());
+    public Memo save(AddMemoRequest request, String userName) {
+        return memoRepository.save(request.toEntity(userName));
     }
 
     public List<Memo> findAll() {
@@ -33,7 +34,11 @@ public class MemoService {
     }
 
     public void delete(long id) {
-        memoRepository.deleteById(id);
+        Memo memo = memoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("not found : " + id));
+
+        authorizeMemoAuthor(memo);
+        memoRepository.delete(memo);
     }
 
     @Transactional
@@ -41,8 +46,18 @@ public class MemoService {
         Memo memo = memoRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("not found: " + id));
 
+        authorizeMemoAuthor(memo);
         memo.update(request.getContent());
 
         return memo;
     }
+
+    private static void authorizeMemoAuthor(Memo memo) {
+        String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        if (!memo.getAuthor().equals(userName)) {
+            throw new IllegalArgumentException("not authorized");
+        }
+    }
+
 }

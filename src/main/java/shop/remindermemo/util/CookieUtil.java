@@ -8,15 +8,18 @@ import org.springframework.util.SerializationUtils;
 import java.util.Base64;
 
 public class CookieUtil {
+
     public static void addCookie(HttpServletResponse response, String name, String value, int maxAge) {
         Cookie cookie = new Cookie(name, value);
         cookie.setPath("/");
         cookie.setMaxAge(maxAge);
+
         response.addCookie(cookie);
     }
 
     public static void deleteCookie(HttpServletRequest request, HttpServletResponse response, String name) {
         Cookie[] cookies = request.getCookies();
+
         if (cookies == null) {
             return;
         }

@@ -26,6 +26,9 @@ public class Memo {
     @Column(name = "content", nullable = false)
     private String content;
 
+    @Column(name = "author", nullable = false)
+    private String author;
+
     @CreatedDate
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -35,7 +38,8 @@ public class Memo {
     private LocalDateTime updatedAt;
 
     @Builder
-    public Memo(String content) {
+    public Memo(String author, String content) {
+        this.author = author;
         this.content = content;
     }
 

@@ -15,9 +15,10 @@ public class AddMemoRequest {
 
     private String content;
 
-    public Memo toEntity() {
+    public Memo toEntity(String author) {
         return Memo.builder()
                 .content(content)
+                .author(author)
                 .build();
     }
 }

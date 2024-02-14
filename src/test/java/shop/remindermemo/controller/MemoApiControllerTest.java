@@ -4,20 +4,29 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+
 import static org.assertj.core.api.Assertions.assertThat;
+
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import shop.remindermemo.domain.Memo;
+import shop.remindermemo.domain.User;
 import shop.remindermemo.dto.AddMemoRequest;
 import shop.remindermemo.dto.UpdateMemoRequest;
 import shop.remindermemo.repository.MemoRepository;
+import shop.remindermemo.repository.UserRepository;
 
+import java.security.Principal;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -43,11 +52,28 @@ class MemoApiControllerTest {
     @Autowired
     MemoRepository memoRepository;
 
+    @Autowired
+    UserRepository userRepository;
+
+    User user;
+
     @BeforeEach
     public void mockMvcSetUp() {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(context)
                 .build();
         memoRepository.deleteAll();
+    }
+
+    @BeforeEach
+    void setSecurityContext() {
+        userRepository.deleteAll();
+        user = userRepository.save(User.builder()
+                .email("user@gmail.com")
+                .password("test")
+                .build());
+
+        SecurityContext context = SecurityContextHolder.getContext();
+        context.setAuthentication(new UsernamePasswordAuthenticationToken(user, user.getPassword(), user.getAuthorities()));
     }
 
 
@@ -61,9 +87,13 @@ class MemoApiControllerTest {
 
         final String requestBody = objectMapper.writeValueAsString(userRequest);
 
+        Principal principal = Mockito.mock(Principal.class);
+        Mockito.when(principal.getName()).thenReturn("username");
+
         // when
         ResultActions result = mockMvc.perform(post(url)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .principal(principal)
                 .content(requestBody));
 
         // then
@@ -80,11 +110,7 @@ class MemoApiControllerTest {
     public void findAllMemos() throws Exception {
         // given
         final String url = "/api/memos";
-        final String content = "content";
-
-        memoRepository.save(Memo.builder()
-                .content(content)
-                .build());
+        Memo savedMemo = createDefaultMemo();
 
         // when
         final ResultActions resultActions = mockMvc.perform(get(url)
@@ -93,7 +119,7 @@ class MemoApiControllerTest {
         // then
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].content").value(content));
+                .andExpect(jsonPath("$[0].content").value(savedMemo.getContent()));
     }
 
     @DisplayName("findMemo")
@@ -101,11 +127,7 @@ class MemoApiControllerTest {
     public void findMemo() throws Exception {
         // given
         final String url = "/api/memos/{id}";
-        final String content = "content";
-
-        Memo savedMemo = memoRepository.save(Memo.builder()
-                .content(content)
-                .build());
+        Memo savedMemo = createDefaultMemo();
 
         // when
         final ResultActions resultActions = mockMvc.perform(get(url, savedMemo.getId()));
@@ -113,19 +135,15 @@ class MemoApiControllerTest {
         // then
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content").value(content));
+                .andExpect(jsonPath("$.content").value(savedMemo.getContent()));
     }
 
-    @DisplayName("deleteArticle")
+    @DisplayName("deleteMemo")
     @Test
-    public void deleteArticle() throws Exception {
+    public void deleteMemo() throws Exception {
         // given
         final String url = "/api/memos/{id}";
-        final String content = "content";
-
-        Memo savedMemo = memoRepository.save(Memo.builder()
-                .content(content)
-                .build());
+        Memo savedMemo = createDefaultMemo();
 
         // when
         mockMvc.perform(delete(url, savedMemo.getId()))
@@ -142,11 +160,7 @@ class MemoApiControllerTest {
     public void updateMemo() throws Exception {
         // given
         final String url = "/api/memos/{id}";
-        final String content = "content";
-
-        Memo savedMemo = memoRepository.save(Memo.builder()
-                .content(content)
-                .build());
+        Memo savedMemo = createDefaultMemo();
 
         final String newContent = "new content";
 
@@ -163,5 +177,12 @@ class MemoApiControllerTest {
         Memo memo = memoRepository.findById(savedMemo.getId()).get();
 
         assertThat(memo.getContent()).isEqualTo(newContent);
+    }
+
+    private Memo createDefaultMemo() {
+        return memoRepository.save(Memo.builder()
+                .author(user.getUsername())
+                .content("content")
+                .build());
     }
 }

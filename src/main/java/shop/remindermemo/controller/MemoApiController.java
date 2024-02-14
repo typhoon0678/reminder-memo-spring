@@ -10,6 +10,7 @@ import shop.remindermemo.dto.MemoResponse;
 import shop.remindermemo.dto.UpdateMemoRequest;
 import shop.remindermemo.service.MemoService;
 
+import java.security.Principal;
 import java.util.List;
 
 /**
@@ -22,8 +23,8 @@ public class MemoApiController {
     private final MemoService memoService;
 
     @PostMapping("/api/memos")
-    public ResponseEntity<Memo> addMemo(@RequestBody AddMemoRequest request) {
-        Memo savedMemo = memoService.save(request);
+    public ResponseEntity<Memo> addMemo(@RequestBody AddMemoRequest request, Principal principal) {
+        Memo savedMemo = memoService.save(request, principal.getName());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(savedMemo);
     }

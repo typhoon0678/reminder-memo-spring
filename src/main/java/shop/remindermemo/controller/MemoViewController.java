@@ -38,7 +38,7 @@ public class MemoViewController {
     }
 
     @GetMapping("/new-memo")
-    public String newArticle(@RequestParam(required = false) Long id, Model model) {
+    public String newMemo(@RequestParam(required = false) Long id, Model model) {
         if (id == null) {
             model.addAttribute("memo", new MemoViewResponse());
         } else {
