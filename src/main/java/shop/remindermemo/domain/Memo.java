@@ -38,9 +38,11 @@ public class Memo {
     private LocalDateTime updatedAt;
 
     @Builder
-    public Memo(String author, String content) {
+    public Memo(String author, String content, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.author = author;
         this.content = content;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
     public void update(String content) {

@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shop.remindermemo.domain.Memo;
 
+import java.time.LocalDateTime;
+
 /**
  * Memo DB 저장 역할
  */
@@ -19,6 +21,8 @@ public class AddMemoRequest {
         return Memo.builder()
                 .content(content)
                 .author(author)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
                 .build();
     }
 }
